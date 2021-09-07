@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 basefile="install"
 logfile="general.log"
 timestamp=`date '+%Y-%m-%d %H:%M:%S'`
@@ -61,22 +62,6 @@ function docker-check() {
 
 }
 
-function docker-compose-check() {
-  scope="docker-compose-check"
-  info_base="[$timestamp INFO]: $basefile::$scope"
-  cmd=`docker-compose -v`
-
-  echo "$info_base started" >> $logfile
-
-  if [ -z "$cmd" ]; then
-    echo "$info_base docker-compose not installed"
-    echo "$info_base docker-compose not installed" >> $logfile
-  fi
-
-  echo "$info_base ended" >> $logfile
-  echo "================" >> $logfile
-
-}
 function usage() {
     echo ""
     echo "Usage: "
@@ -98,9 +83,11 @@ function start-up(){
 
     sudo docker build -t $docker_img_name .
 
+    echo "$info_base enabling xhost connection to image" >> $logfile
+
     echo "$info_base running image" >> $logfile
 
-    sudo docker run -ti --rm -p "80:4567" $docker_img_name
+    sudo docker run -ti --rm -p "80:8080" $docker_img_name
 
     echo "$info_base ended" >> $logfile
 
@@ -113,7 +100,7 @@ function tear-down(){
 
     echo "$info_base started" >> $logfile
 
-    echo "$info_base starting services" >> $logfile
+    echo "$info_base services removed" >> $logfile
 
     echo "$info_base ended" >> $logfile
 
@@ -122,7 +109,6 @@ function tear-down(){
 
 root-check
 docker-check
-docker-compose-check
 
 while getopts ":udh" opts; do
   case $opts in
